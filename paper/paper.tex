@@ -1,3 +1,4 @@
+% !TEX root = ./paper/paper.tex
 %% This is an abbreviated template from http://www.sigplan.org/Resources/Author/.
 
 \documentclass[acmsmall,review,nonacm]{acmart}
@@ -14,10 +15,8 @@
 %% Of note is the shared affiliation of the first two authors, and the
 %% "authornote" and "authornotemark" commands
 %% used to denote shared contribution to the research.
-\author{TBD}
-\email{tbd@colorado.edu}
-\author{TBD}
-\email{tbd@colorado.edu}
+\author{Aka Sai Lalith Kumar}
+\email{sailalithkumar.aka@colorado.edu}
 \affiliation{%
   \institution{University of Colorado Boulder}
   \country{USA}
@@ -28,7 +27,14 @@
 %% The abstract is a short summary of the work to be presented in the
 %% article.
 \begin{abstract}
-  TBD
+We have a lot of theoretically rigorous over-approximation logics, which is to be expected given the rich treatment they have been enjoying for the last 5 decades. 
+Under-approximation is the other side of the coin where the potential lies for development. 
+An area which is nascent would be the application of Under-approximation logics to security models. 
+This takes us from the realm of showing a protocol is secure to finding an attack within the protocol which is guarnteed to exist.
+This is a value add, and something the security industry has already adopted though without much formal methods through exploitability analysis. 
+In this work, we aim to show with a theortical guarntee that the current core logics which support them are what they promise to be.
+They are sound, and they do have the capabilities to detect iterative, multistage attacks where adversaries interact with the loop.
+This effectively bridges the gap from current knowledge about exploitability and increases further confidence in the dissemination of the technique.
 \end{abstract}
 
 %%
@@ -40,9 +46,11 @@
 
 \section{Overview}
 
-\section{[Contribution 1]}
+\section{Semantics}
 
-\section{[Contribution 2]}
+\section{Soundness}
+
+\section{Bounded Completness}
 
 \section{Evaluation}
 
@@ -56,7 +64,13 @@
 %% identification of the section in the article metadata, and the
 %% consistent spelling of the heading.
 \begin{acks}
-TBD
+Bohr-Yuh Evan Chang, Kirby Linvill and Gowtham Kaki.
+
+Dakota Brayan
+
+Fabio Somenzi
+
+
 \end{acks}
 
 %%
