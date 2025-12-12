@@ -142,33 +142,12 @@ $\Sigma ::= [PIDs \rightharpoonup Variables \to Values]$
 Let $\Pi \in \Sigma$ be a global state. We denote $\Pi(i)$ as the local store of process $i$.
 We also maintain the global channel state $\Gamma \in [Channels \to List(Values)]$. A configuration is a tuple $\langle \Pi, \Gamma \rangle$.
 
-\begin{definition} [Small-step semantics for Composition]
-Let $C_1 \parallel \dots \parallel C_n$ be a composition of $n$ processes.
-\begin{itemize}
-    \item \textbf{Independent Step:} If process $i$ takes a local step $\langle \sigma_i, \Gamma \rangle \to \langle \sigma_i', \Gamma \rangle$, then:
-    $$ \langle \Pi[i \mapsto \sigma_i], \Gamma \rangle \to \langle \Pi[i \mapsto \sigma_i'], \Gamma \rangle $$
-    \item \textbf{Communication Step:} If process $i$ writes to channel $c$ and process $j$ reads from channel $c$, they synchronize:
-    $$ \langle \Pi, \Gamma \rangle \xrightarrow{i!c(v), j?c(v)} \langle \Pi', \Gamma' \rangle $$
-    where $\Pi'$ updates the local variables of $i$ and $j$ appropriately.
-    \item \textbf{Termination:} $skip \parallel \dots \parallel skip$ is the terminal configuration.
-\end{itemize}
-\end{definition}
-
-We restate the properties of channels and local variables for processes from adversarial logic.
-\begin{hypothesis}[Ownership Principle]
-\leavevmode
-    \begin{itemize}
-        \item No two parallel processes share the same local variables and are distinctly separated (Disjointness). $\forall i \neq j, dom(\Pi(i)) \cap dom(\Pi(j)) = \emptyset$.
-        \item They can only communicate through channels, which we state are global and represented by $\Gamma$.
-    \end{itemize}
-\end{hypothesis}
-
-\subsection{Generalized Triples}
 A key notation change from adversarial logic is that instead of using $[\epsilon:P]$ where $\epsilon \in \{ad, ok\}$, we define $\Delta$ as a mapping from PIDs to assertions.
 
 \begin{definition} [Generalized Triple]
     $[\Delta_{pre}] C [\Delta_{post}]$
 \end{definition}
+
 
 For processes Alice ($A$), Bob ($B$), and Eve ($E$), $\Delta$ maps identities to assertions: $\{A: P_A, B: P_B, E: P_{Eve}\}$.
 The triple $[\Delta] C [\Delta']$ is valid if, for all processes $i \in dom(\Delta)$, the local execution satisfies the under-approximate relation between $\Delta(i)$ and $\Delta'(i)$.
@@ -185,6 +164,7 @@ To reason about what an adversary knows, we define the syntax for expressions an
 \end{definition}
 Here, $\text{Knows}(E)$ is a predicate indicating that the value $E$ is derivable from the agent's current knowledge set using Dolev-Yao deduction rules.
 
+\subsection{Semantics}
 \begin{definition} [Small-step semantics for Composition]
 Let $C_1 \parallel \dots \parallel C_n$ be a composition of $n$ processes.
 \begin{itemize}
