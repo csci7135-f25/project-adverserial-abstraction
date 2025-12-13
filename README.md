@@ -1,6 +1,5 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/KIMhwtUS)
-# project
-
+# project: Skja
+This repo is for Sai Lalith Kumar's submission for Program Analysis: Theory and Practice - CSCI 7135 - Fall 2025 taught by Dr Bor-Yuh Evan Chang. The work is mostly theortical and it targets underapproximation logic for security as the main contribution in the ./paper/ folder, where you can find the paper. We also attach code for formalising Needham-Schroeder and proving the existence of the Lowe's attack in the Lean theorem prover. The code could be found in the ./code/ folder. The code was developed for different work, but the extension will be pushed for incorrect logic as future work.
 ## Organization
 
 This repository is organized as follows:
@@ -10,6 +9,7 @@ This repository is organized as follows:
 ├── README.md
 ├── code
 │   └── README.md
+|   ├── ns.lean 
 ├── paper
 │   ├── Makefile
 │   ├── README.md

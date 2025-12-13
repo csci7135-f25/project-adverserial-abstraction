@@ -53,7 +53,13 @@
 %% The abstract is a short summary of the work to be presented in the
 %% article.
 \begin{abstract}
-We introduce \textit{Skja}, a new incorrectness logic \cite{o2019incorrectness} which extends on \textit{Adversarial Logic} \cite{vanegue2022adversarial} with spi-calculus. Adversarial logic is very interesting in that it lets you apply under-approximation for exploitability analysis. The current core limitation of adversarial logic is that it only allows for parallel composition over multiple programs but it has problems with the model. With Skja, we bring the rich theory of spi-calculus to let the logic be composable for any infinite arbitrary set of  programs which may be adversarial or not. This lets us encode and talk about attacks like Man-in-the-middle (MiTM) attacks and DDoS (Denial of Service) attacks. For this end, we first prove that parallel composition is a monoid over the adversarial logic grammar. We change the denotational semantics and program rules to support n-ary parallel composition while also proving that the changes do not effect the soundness. We also show.
+We introduce \textit{Skja}, a new incorrectness logic \cite{o2019incorrectness} which extends on \textit{Adversarial Logic} \cite{vanegue2022adversarial} with spi-calculus. 
+Adversarial logic is very interesting in that it lets you apply under-approximation for exploitability analysis. 
+The current core limitation of adversarial logic is that it only allows for parallel composition over multiple programs but it has problems with the model. 
+With Skja, we bring the rich theory of spi-calculus to let the logic be composable for any infinite arbitrary set of programs which may be adversarial or not. 
+This lets us encode and talk about attacks like Man-in-the-middle (MiTM) attacks and DDoS (Denial of Service) attacks.
+For this end, we first prove that parallel composition is a monoid over the adversarial logic grammar. 
+We change the denotational semantics and program rules to support n-ary parallel composition while also proving that the changes do not effect the soundness. We also show a reasoning of Skja on Needham-Schroeder to highlight 
  \end{abstract}
 
 %%
@@ -62,7 +68,8 @@ We introduce \textit{Skja}, a new incorrectness logic \cite{o2019incorrectness} 
 \maketitle
 
 \section{Introduction}
-When one reasons about programmes, we have access to a rich variety of logics, and one of them would be incorrectness logic \cite{o2019incorrectness} which is equivalent to \cite{de2011reverse}. The logic targets under-approximating the post of a condition c; this is symmetrical to the work done by Hoare\cite{hoare1969axiomatic} which over-approximates. 
+When one reasons about programmes, we have access to a rich variety of logics, and one of them would be incorrectness logic \cite{o2019incorrectness} which is equivalent to \cite{de2011reverse}. 
+The logic targets under-approximating the post of a condition c; this is symmetrical to the work done by Hoare\cite{hoare1969axiomatic} which over-approximates. 
 The way we can understand this through diagrammatic representation is by visualising the state space as a hierarchy of set inclusions, taken from O'Hearn's presentation. 
 As shown in Figure \ref{fig:logic_triangle}, the central arrow represents the \textit{strongest postcondition} ($post(c)$), which describes exactly the set of states reachable by the program.
 
@@ -105,9 +112,9 @@ As shown in Figure \ref{fig:logic_triangle}, the central arrow represents the \t
 In this hierarchy, the top layer corresponds to standard Hoare Logic. It provides an \textit{over-approximation}, meaning the postcondition $Q$ must contain all reachable states ($post(c) \subseteq Q$). This is useful for proving safety (i.e., "nothing bad happens").
 
 Conversely, the bottom layer represents under-approximation. Here, the postcondition $Q$ must be a \textit{subset} of the reachable states ($Q \subseteq post(c)$). This logic is useful for proving the existence of bugs or specific reachable states (i.e., "something bad definitely happens").
-Now, you can also observe, the triangle for top is rather short compared to the triangle for the bottom. This is a delibrate choice to highlight the fact that over-approximation enojoyed 5 decades of being in the front seat \cite{apt1981ten,apt1983ten,ali2017survey} and hence the closeness to the prefect postcondition.
+Now, you can also observe, the triangle for top is rather short compared to the triangle for the bottom. This is a delibrate choice to highlight the fact that over-approximation enjoyed 5 decades of being in the front seat \cite{apt1981ten,apt1983ten,ali2017survey} and hence the closeness to the perfect postcondition.
 
-To show case an example with under-approximation, we take a rather simple looking but tricky example derived from \cite{de2011reverse} below comparing the validity of the triplets shown below:
+To showcase an example with under-approximation, we take a rather simple looking but tricky example derived from \cite{de2011reverse} below comparing the validity of the triplets shown below:
 
 \begin{equation*}
     \langle T \rangle \quad x := y; \ z := x \quad \langle z = y \rangle \quad \colorbox{invalidred}{\textbf{Not Valid}}
@@ -122,11 +129,33 @@ This triplet is invalid in under-approximation logic. While it is true that $z=y
 This triplet is valid. By conjoining $x=y$, we restrict the postcondition to exclude the unreachable states. The resulting set matches exactly the behavior of the code, satisfying the requirement $Q \subseteq post(c)$.
 Application of under-approximation to security reasoning is a very novel yet fundamental contribution \cite{vanegue2022adversarial}.
 And this contribution brings proving software or protocols are secure to the realm of finding bugs or vulnerabilities aka exploitability analysis \cite{elder2024survey}.
-A simple analysis tool running on a rather not complicated software usually returns many bugs \cite{serebryany2016continuous} and many of them are usually false positives.
-In the era of move fast, break fast \cite{cohen2004introduction} this puts a lot of burden on security bug triagers who have to classify each bug for it's true validty and slows the development cycle a lot given if a team moves with an unsure bug.
-This breaks rythm and destroys planning of the required
 
-\section{Overview}
+In the context of security auditing, the cost of a "false positive" is exceptionally high. Static analysis tools that over-approximate often drown developers in warnings that may never manifest in reality \cite{serebryany2016continuous}. This "boy who cried wolf" phenomenon desensitizes engineers to security alerts. 
+Incorrectness logic flips this paradigm: if the logic derives a state where a secret is leaked, that leak is guaranteed to be reachable. There are no false alarms, only confirmed kill chains. This property is invaluable for exploit generation, where the goal is to produce a concrete attack trace rather than an abstract guarantee of safety.
+
+Contributions. In this paper, we bridge the gap between incorrectness logic and process calculi. Specifically:
+\begin{itemize}
+\item We formalize parallel composition as a commutative monoid over the adversarial logic grammar, proving that the system can be treated as an unstructured "soup" of processes rather than a rigid hierarchy.
+\item We introduce \textit{Skja}, extending the semantics of Adversarial Logic with primitives from the spi-calculus to support n-ary multi-party composition.
+\item We validate our logic by formally deriving the attack trace for the Needham-Schroeder Public Key protocol, demonstrating how Skja naturally captures Man-in-the-Middle scenarios that previous binary models struggled to express.
+\end{itemize}
+
+
+\section{Overview: Why Adversarial Logic Isn't Enough}
+
+Before introducing our semantics, we must address why standard Adversarial Logic (AL) \cite{vanegue2022adversarial} is insufficient for modeling complex protocols, necessitating an upgrade to the spi-calculus model. We identify three core friction points:
+
+\textbf{1. The Monolithic State Problem.}
+Standard AL models the world as a rigid couple $(\sigma_p, \sigma_a)$—the program and the adversary. This forces a separation of concern that is unnatural for multi-party protocols. In a scenario like Needham-Schroeder, we have Alice, Bob, and potentially Charlie (the attacker). AL struggles to distinguish between the honest state of Bob and the honest state of Alice; they are lumped into $\sigma_p$. Skja dissolves this monolith by mapping Process IDs to local stores ($\Pi(i)$), allowing us to reason about the state of specific agents independently.
+
+\textbf{2. Fixed Topologies.}
+In AL, the network topology is generally static; the "Program" communicates with the "Adversary" over a pre-defined boundary.
+However, modern protocols utilize scope extrusion and channel mobility. 
+A server might create a temporary session channel and pass it to a client, dynamically altering the network topology. The spi-calculus treats channels as first-class citizens that can be encrypted and sent as messages. 
+Skja adopts this power, allowing us to reason about attacks where the structure of the network changes during the attack—such as an adversary injecting themselves into a session by stealing a session ID (channel) that didn't exist when the protocol started.
+
+\textbf{3. Replication and Asynchrony.}
+Finally, modeling infinite behavior via the replication operator ($!P$) is native to spi-calculus but cumbersome in standard AL. While our current implementation focuses on finite traces for exploit generation, building on the spi-calculus foundation prepares Skja for future extensions involving unbounded replication, such as modeling Distributed Denial of Service (DDoS) attacks where $N$ attackers flood a target.
 
 \section{New Semantics}
 
@@ -267,37 +296,61 @@ Proof: A commutative monoid has three properties for it to satisfy. We show that
 \begin{lemma} [Permutations of || ]
     For any set of processes $\{C_1, ..., C_n\}$, any syntactic permutation of their composition results in an equivalent system under the defined denotational semantics.
 \end{lemma}
-
-
-\subsection{Soundness}
-We prove the soundness of the inference rules by showing that if the premises hold, the conclusion satisfies the under-approximation reachability property (Lemma 2).
-
-\begin{lemma}[Characterization for n-ary Systems]
-The triple $[\Delta_{pre}] C [\Delta_{post}]$ is true iff every state in $\llbracket \Delta_{post} \rrbracket$ is reachable from a state in $\llbracket \Delta_{pre} \rrbracket$ via the operational semantics of $C$.
+\subsection{Foundational Lemmas}
+We prove the soundness of Skja by demonstrating that our inference rules preserve the under-approximation property defined in Adversarial Logic. To do so, we first adapt the Characterization and Substitution lemmas from Vanegue \cite{vanegue2022adversarial} to our $n$-ary state space $\Sigma$.
+\begin{lemma}[Characterization]
+\label{lemma:char}
+A triple $[\Delta_{pre}] C [\Delta_{post}]$ is valid if and only if every state satisfying the post-condition is reachable from a state satisfying the pre-condition via the operational semantics of $C$. Formally:
+$$ \forall \Pi' \in \llbracket \Delta_{post} \rrbracket, \exists \Pi \in \llbracket \Delta_{pre} \rrbracket \text{ such that } \langle \Pi, \Gamma \rangle \to^* \langle \Pi', \Gamma' \rangle $$
 \end{lemma}
+
+\begin{lemma}[Substitution]
+\label{lemma:sub}
+For any assertion $P$, variable $x$, and value $v$:
+$$ \sigma \in \llbracket P[v/x] \rrbracket \iff \sigma[x \mapsto v] \in \llbracket P \rrbracket $$
+This lemma ensures that asserting a property about a variable $x$ in a post-state is equivalent to asserting the property about the value $v$ assigned to $x$ in the pre-state.
+\end{lemma}
+
+\subsection{Soundness of Inference Rules}
 
 \begin{theorem}[Soundness of n-Par]
 The n-Par rule is valid.
 \end{theorem}
 \begin{proof}
-Let $\Pi' \in \llbracket \Delta_{post} \rrbracket$ be a target global state. By the definition of the state space, $\Pi'$ decomposes into local stores $\Pi'(i)$. From the premises, for each $i$, $[\Delta_{pre}(i)] C_i [\Delta_{post}(i)]$ is valid, implying $\exists \sigma_i \in \llbracket \Delta_{pre}(i) \rrbracket$ such that $\sigma_i \to^* \sigma_i'$ via $C_i$.
-By the \textbf{Ownership Principle} (Hypothesis 1), domains are disjoint. Consequently, the \textbf{Independent Step} semantics apply, allowing local transitions to be interleaved without interference. Thus, starting from $\Pi = \bigcup_i \sigma_i$, the global system reaches $\Pi'$ via $C_1 \parallel \dots \parallel C_n$.
+We must show that if the premises $\forall i, [\Delta_{pre}(i)] C_i [\Delta_{post}(i)]$ hold, then $[\Delta_{pre}] C_1 \parallel \dots \parallel C_n [\Delta_{post}]$ satisfies the Characterization Lemma.
+
+Let $\Pi' \in \llbracket \Delta_{post} \rrbracket$ be a global state satisfying the post-condition. By the definition of our generalized state space, $\Pi'$ decomposes into disjoint local stores: $\Pi' = \bigcup_{i} \sigma_i'$ where $\sigma_i' \in \llbracket \Delta_{post}(i) \rrbracket$.
+
+By applying the \textbf{Characterization Lemma} to each premise individually:
+$$ \forall i, \exists \sigma_i \in \llbracket \Delta_{pre}(i) \rrbracket \text{ such that } \langle \sigma_i, \Gamma \rangle \to^* \langle \sigma_i', \Gamma_i' \rangle $$
+
+We construct the global start state $\Pi = \bigcup_{i} \sigma_i$. By the \textbf{Independent Step} semantics defined in Section 3.2:
+$$ \text{If } \langle \sigma_i, \Gamma \rangle \to \langle \sigma_i', \Gamma \rangle \text{ then } \langle \Pi[i \mapsto \sigma_i], \Gamma \rangle \to \langle \Pi[i \mapsto \sigma_i'], \Gamma \rangle $$
+Because the domains of $\sigma_i$ are disjoint (Hypothesis 1), the local transitions of each process $C_i$ can be interleaved without interference. Therefore, the sequence of independent steps transforms $\Pi$ into $\Pi'$. Since $\Pi \in \llbracket \Delta_{pre} \rrbracket$ and $\Pi' \in \llbracket \Delta_{post} \rrbracket$, the characterization holds.
 \end{proof}
+
 
 \begin{theorem}[Soundness of n-Com]
 The n-Com rule is valid.
 \end{theorem}
 \begin{proof}
-Let $\Pi' \in \llbracket \Delta_{post} \rrbracket$. For idle processes $k \notin \{i,j\}$, $\Delta_{pre}(k) = \Delta_{post}(k)$, satisfying the frame property via trivial reachability (0 steps).
-For interacting processes, the premises guarantee the existence of local pre-states $\sigma_i \in \llbracket \Delta_{pre}(i) \rrbracket$ and $\sigma_j \in \llbracket \Delta_{pre}(j) \rrbracket$ that can perform output and input respectively.
-The \textbf{Communication Step} semantics $\langle \Pi, \Gamma \rangle \xrightarrow{i!c(v), j?c(v)} \langle \Pi', \Gamma' \rangle$ synchronizes these steps. Specifically, the semantic rule updates the receiver's store $\sigma_j'$ such that $x = v$. Since the premises hold and the operational semantics explicitly enforce the data flow $v \to x$, the global post-state where receiver variable $x$ holds sender value $v$ is reachable from $[\Delta_{pre}]$.
+We analyze the synchronization between a sender $i$ and receiver $j$ on channel $c$. Let $\Pi' \in \llbracket \Delta_{post} \rrbracket$. We focus on the receiver's state $\sigma_j'$ (the sender's side follows similarly).
+
+The premise for the receiver is $[\Delta_{pre}(j)] \text{in}(c, x) [\Delta_{post}(j)]$. The operational semantics for communication state that:
+$$ \langle \Pi, \Gamma \rangle \xrightarrow{i!c(v), j?c(v)} \langle \Pi', \Gamma' \rangle $$
+where the receiver's local store updates as $\sigma_j' = \sigma_j[x \mapsto v]$.
+
+By the premise, we know $\sigma_j' \in \llbracket \Delta_{post}(j) \rrbracket$.
+Substituting the operational update into the assertion, we require $\sigma_j[x \mapsto v] \in \llbracket \Delta_{post}(j) \rrbracket$.
+
+We now invoke the \textbf{Substitution Lemma} (\ref{lemma:sub}). This implies:
+$$ \sigma_j \in \llbracket \Delta_{post}(j)[v/x] \rrbracket $$
+The assertion $\Delta_{post}(j)$ implies $x=v$. Therefore, there exists a pre-state $\sigma_j$ capable of receiving $v$ such that the post-state condition is met. Since the operational semantics explicitly perform the assignment $x \leftarrow v$ that satisfies the logic, and the Characterization Lemma is satisfied for the step, the rule is sound.
 \end{proof}
+\section{Reasoning with Sjka: Needham-Schroeder}
 
-
-\section{Reasoning with Sjka: Needham-Schroder}
-
-\subsection{Needham-Schroder}
-Needham-Schroder(NS)\cite{needham1978using}, is an authenatication protocol. The way it runs is as follows:
+\subsection{Needham-Schroeder}
+Needham-Schroeder(NS)\cite{needham1978using}, is an authentication protocol. The way it runs is as follows:
 \begin{figure}
     \centering
     \label{fig:ns}
@@ -309,7 +362,7 @@ Needham-Schroder(NS)\cite{needham1978using}, is an authenatication protocol. The
 \draw[<-,thick] (A.east) -- node[above]{$(Na, Nb)_{PubA}$} (B.west);
 \draw[->,thick] ([yshift=-8mm]A.east) -- node[above]{$(Nb)_{PubB}$} ([yshift=-8mm]B.west);
 \end{tikzpicture}
-    \caption{Needham-Schroder}
+    \caption{Needham-Schroeder}
 \end{figure}
 
 
@@ -420,14 +473,41 @@ The final state $\Delta_{final}$ contains a contradiction to the authentication 
     \item $\Delta_{final}(C) \implies \text{Knows}(Na, Nb)$
 \end{enumerate}
 In Skja, the reachability of $\Delta_{final}$ where the adversary knows $Nb$ constitutes a proof of the exploit. The proof script could be more integrated to look like the reasoning of adversarial logic, but we choose to keep it focused on the rules we have defined.
+
 \section{Related Work}
-Related work in program analysis and formal verification of protocols and softwares come with a rather rich history. We stand on the shoulders of the gaints, and a small exposition in this section will never give with an $n$-ary composition model based on the spi-calculus, allowing for more complex network topologies.
+Related work in program analysis and formal verification of protocols and software comes with a rather rich history. We stand on the shoulders of giants, yet the integration of incorrectness logic with process calculi remains under-explored.
 
-\section{Conclusion}
-In this paper, we adapted under-approximation logic for security and boosted its versatility by integrating techniques from the spi-calculus. We demonstrated that this extension preserves the soundness of the underlying logic through formal proofs. Finally, we applied Skja to the Needham-Schroeder protocol, formally proving the validity of the classic Man-in-the-Middle vulnerability.
+\textbf{Program Logics.} The foundation of our work rests on Incorrectness Logic \cite{o2019incorrectness}, which inverted the reasoning of standard Hoare Logic \cite{hoare1969axiomatic}. While standard logic proves the absence of bugs, incorrectness logic proves their presence. This is particularly relevant for security, where demonstrating an exploit path is often more valuable than a theoretical safety guarantee.
 
+\textbf{Process Calculi and Security.} The use of process calculi \cite{milner1980calculus} to model security protocols was pioneered by Abadi and Gordon with the spi-calculus % \cite{abadi1999calculus}. 
+This introduced cryptographic primitives directly into the operational semantics of the $\pi$-calculus. While automated tools like ProVerif \cite{blanchet2018proverif}, WALDO \cite{linvill2023verifying} and Tamarin\cite{meier2013tamarin}
+have successfully applied these concepts using model checking, Skja aims to bring this expressivity into a deductive logic framework.
+
+\textbf{Abstract Interpretation.} 
+Abstract Interpretation \cite{cousot1996abstract} is the archetypal framework for static analysis, traditionally used to compute over-approximations of program behaviors to prove safety (i.e., that bad states are unreachable). In the context of Skja and Adversarial Logic, we utilize the framework of Abstract Interpretation but invert the lattice direction. Instead of the lattice of properties over-approximating the set of traces, we operate on the \textit{under-approximate} domain.
+
+As noted by O'Hearn \cite{o2019incorrectness} and Vanegue \cite{vanegue2022adversarial}, incorrectness logic can be viewed as an abstract interpretation where the domain $\mathcal{D}$ represents subsets of reachable states. For Skja, our domain is enriched with the Dolev-Yao adversary model. We can define our abstract domain $\mathcal{D}^\sharp$ as the product of the program state lattice and the adversary knowledge lattice:
+$$ \mathcal{D}^\sharp = \mathcal{P}(\Sigma_{prog}) \times \mathcal{K}_{adv} $$
+where $\mathcal{K}_{adv}$ represents the set of derivable messages. The abstraction function $\alpha$ maps concrete execution traces to these logical assertions. Our fixpoint computation, therefore, does not find the "smallest set containing all behaviors" (Least Fixpoint in safety analysis), but rather attempts to find a "non-empty set of confirmed behaviors" (identifying satisfying traces for exploitation). This aligns Skja with \textit{under-approximate abstract interpretation}, a growing field that formalizes bug finding as a rigorous static analysis discipline rather than heuristics.
+There is also rather interesting working showing the connection between abstract interpretation and program logics which state the connection between them \cite{cousot2024calculational}.
+\textbf{Adversarial Logic.} The most direct predecessor to Skja is Adversarial Logic \cite{vanegue2022adversarial}. While groundbreaking in applying under-approximation to security, it is limited by its "rigid couple" state space (Program vs. Adversary). Our work generalizes this to an $n$-ary composition, effectively unblocking the modeling of multi-party protocols and complex topologies that were previously awkward to represent in the original Adversarial Logic framework.
+\section{Conclusion and future work} 
+In this paper, we adapted under-approximation logic for security and boosted its versatility by integrating techniques from the spi-calculus.
+This in effect turned the adversarial logic from a rigid monolith to a dynamic system.
+We demonstrated that this extension preserves the soundness of the underlying logic through formal proofs. 
+Finally, we applied Skja to the Needham-Schroeder protocol, formally proving the validity of the classic Man-in-the-Middle vulnerability.
+The expressiblity of Skja shines when it comes to multi-parties, especially in the context of IOT and distributed systems. 
+One strong fit we can see is to use Skja to reason about Denial of Service Attacks (DDoS). The spi-calculi based !P operator would be the right fit.
+An interesting line of future work is to turn Skja into an algorithm which not only verifies but synthesizes the attack traces. 
+This could be achieved through a bounded model checking based search algorithms.
+Both under-approximation and over-approximation could be combined like in \cite{zilberstein2023outcome} to get benefit of both worlds.
+We believe this to be an interesting research direction. 
+One could also Certify incorrectness logic and Skja with a dependent type theory based theorem prover like Lean \cite{de2015lean}, ROCQ \cite{chlipala2013certified} and Isabelle\cite{paulson1994isabelle}.
+Finally, as reviewed in related work, application of abstract interpretation to underapproximation is exiciting direction.
 \begin{acks}
-I thank my advisor, Dr. Gowtham Kaki. I acknowledge Dr. Bohr-Yuh Evan Chang and Kirby Linvill for their instruction on PL. Thanks to Dakota Brayan for feedback, and Dr. Fabio Somenzi for teaching me about logic.
+I thank my advisor, Dr. Gowtham Kaki. 
+I acknowledge Dr. Bor-Yuh Evan Chang and Kirby Linvill for teaching me all I know about PL. 
+Thanks to Dakota Brayan for feedback, and Dr. Fabio Somenzi for teaching me about logic.
 \end{acks}
 
 \bibliographystyle{ACM-Reference-Format}
