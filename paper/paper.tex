@@ -69,7 +69,7 @@ with usability in the MiTM attacks. We also give some future directions in this 
 \maketitle
 
 \section{Introduction}
-When one reasons about programmes, we have access to a rich variety of logics, and one of them would be incorrectness logic \cite{o2019incorrectness} which is equivalent to \cite{de2011reverse}. 
+When one reasons about programs, we have access to a rich variety of logics, and one of them would be incorrectness logic \cite{o2019incorrectness} which is equivalent to \cite{de2011reverse}. 
 The logic targets under-approximating the post of a condition c; this is symmetrical to the work done by Hoare\cite{hoare1969axiomatic} which over-approximates. 
 The way we can understand this through diagrammatic representation is by visualising the state space as a hierarchy of set inclusions, taken from O'Hearn's presentation. 
 As shown in Figure \ref{fig:logic_triangle}, the central arrow represents the \textit{strongest postcondition} ($post(c)$), which describes exactly the set of states reachable by the program.
@@ -113,7 +113,7 @@ As shown in Figure \ref{fig:logic_triangle}, the central arrow represents the \t
 In this hierarchy, the top layer corresponds to standard Hoare Logic. It provides an \textit{over-approximation}, meaning the postcondition $Q$ must contain all reachable states ($post(c) \subseteq Q$). This is useful for proving safety (i.e., "nothing bad happens").
 
 Conversely, the bottom layer represents under-approximation. Here, the postcondition $Q$ must be a \textit{subset} of the reachable states ($Q \subseteq post(c)$). This logic is useful for proving the existence of bugs or specific reachable states (i.e., "something bad definitely happens").
-Now, you can also observe, the triangle for top is rather short compared to the triangle for the bottom. This is a delibrate choice to highlight the fact that over-approximation enjoyed 5 decades of being in the front seat \cite{apt1981ten,apt1983ten,ali2017survey} and hence the closeness to the perfect postcondition.
+Now, you can also observe, the triangle for top is rather short compared to the triangle for the bottom. This is a deliberate choice to highlight the fact that over-approximation enjoyed 5 decades of being in the front seat \cite{apt1981ten,apt1983ten,ali2017survey} and hence the closeness to the perfect postcondition.
 
 To showcase an example with under-approximation, we take a rather simple looking but tricky example derived from \cite{de2011reverse} below comparing the validity of the triplets shown below:
 
@@ -515,8 +515,8 @@ This could be achieved through a bounded model checking based search algorithms.
 Both under-approximation and over-approximation could be combined like in \cite{zilberstein2023outcome} to get benefit of both worlds.
 We believe this to be an interesting research direction. 
 One could also Certify incorrectness logic and Skja with a dependent type theory based theorem prover like Lean \cite{de2015lean}, ROCQ \cite{chlipala2013certified} and Isabelle\cite{paulson1994isabelle}. 
-The Dolev-Yao attacker formalisim could follow the work \cite{paulson1997proving} which follows Isabelle to construct a induction based protcol.
-Finally, as reviewed in related work, application of abstract interpretation to underapproximation is exiciting direction.
+The Dolev-Yao attacker formalism could follow the work \cite{paulson1997proving} which follows Isabelle to construct a induction based protocol.
+Finally, as reviewed in related work, application of abstract interpretation to underapproximation is an exciting direction.
 \begin{acks}
 I thank my advisor, Dr. Gowtham Kaki. 
 I acknowledge Dr. Bor-Yuh Evan Chang and Kirby Linvill for teaching me all I know about PL. 
