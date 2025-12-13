@@ -60,6 +60,7 @@ With Skja, we bring the rich theory of spi-calculus to let the logic be composab
 This lets us encode and talk about attacks like Man-in-the-middle (MiTM) attacks and DDoS (Denial of Service) attacks.
 For this end, we first prove that parallel composition is a monoid over the adversarial logic grammar. 
 We change the denotational semantics and program rules to support n-ary parallel composition while also proving that the changes do not effect the soundness. We also show a reasoning of Skja on Needham-Schroeder to highlight 
+with usability in the MiTM attacks. We also give some future directions in this space.
  \end{abstract}
 
 %%
@@ -133,26 +134,35 @@ And this contribution brings proving software or protocols are secure to the rea
 In the context of security auditing, the cost of a "false positive" is exceptionally high. Static analysis tools that over-approximate often drown developers in warnings that may never manifest in reality \cite{serebryany2016continuous}. This "boy who cried wolf" phenomenon desensitizes engineers to security alerts. 
 Incorrectness logic flips this paradigm: if the logic derives a state where a secret is leaked, that leak is guaranteed to be reachable. There are no false alarms, only confirmed kill chains. This property is invaluable for exploit generation, where the goal is to produce a concrete attack trace rather than an abstract guarantee of safety.
 
-Contributions. In this paper, we bridge the gap between incorrectness logic and process calculi. Specifically:
+While Incorrectness Logic has shown great promise for sequential programs (finding memory bugs, null pointer dereferences), applying it to distributed security protocols presents a unique challenge\cite{raad2022concurrent}.
+Protocols are not merely sequential programs; they are concurrent, message-passing systems operating in the presence of an active attacker (the Dolev-Yao model). Existing attempts to apply IL to security, such as Adversarial Logic [16], restrict the world to a binary interaction: "The Program" vs. "The Adversary."
+Skja removes this restriction. By marrying the under-approximate reasoning of IL with the Spi-calculus, a process calculus designed specifically for cryptographic protocols. We provide a logic that can reason about complex, multi-party interactions (Alice, Bob, Server, Attacker) without abstracting away the crucial details of channel mobility and distributed state.
+Contributions. 
+
+In this paper, we bridge the gap between incorrectness logic and process calculi. Specifically:
 \begin{itemize}
 \item We formalize parallel composition as a commutative monoid over the adversarial logic grammar, proving that the system can be treated as an unstructured "soup" of processes rather than a rigid hierarchy.
 \item We introduce \textit{Skja}, extending the semantics of Adversarial Logic with primitives from the spi-calculus to support n-ary multi-party composition.
 \item We validate our logic by formally deriving the attack trace for the Needham-Schroeder Public Key protocol, demonstrating how Skja naturally captures Man-in-the-Middle scenarios that previous binary models struggled to express.
 \end{itemize}
 
-
 \section{Overview: Why Adversarial Logic Isn't Enough}
 
 Before introducing our semantics, we must address why standard Adversarial Logic (AL) \cite{vanegue2022adversarial} is insufficient for modeling complex protocols, necessitating an upgrade to the spi-calculus model. We identify three core friction points:
 
-\textbf{1. The Monolithic State Problem.}
-Standard AL models the world as a rigid couple $(\sigma_p, \sigma_a)$—the program and the adversary. This forces a separation of concern that is unnatural for multi-party protocols. In a scenario like Needham-Schroeder, we have Alice, Bob, and potentially Charlie (the attacker). AL struggles to distinguish between the honest state of Bob and the honest state of Alice; they are lumped into $\sigma_p$. Skja dissolves this monolith by mapping Process IDs to local stores ($\Pi(i)$), allowing us to reason about the state of specific agents independently.
+\textbf{1. The Monolithic State Problem and Privacy.} 
+Standard AL models the world as a rigid couple $(\sigma_p, \sigma_a)$, representing a single global store for the program and a single store for the adversary. 
+This forces a separation of concern that is unnatural for protocols. 
+In a monolithic model, proving that Alice's private key remains secret requires complex side-conditions to ensure Bob (part of the ``program'') does not accidentally read it from the shared global heap. 
+In reality, distributed systems share nothing but messages. 
+Skja dissolves this monolith by mapping Process IDs to distinct local stores ($\Pi(i)$). 
+This allows us to verify not just that the \textit{Attacker} does not know the secret, but that \textit{Bob} does not know Alice's secret either, a requirement for privacy-preserving protocols that AL cannot easily express.
 
 \textbf{2. Fixed Topologies.}
 In AL, the network topology is generally static; the "Program" communicates with the "Adversary" over a pre-defined boundary.
 However, modern protocols utilize scope extrusion and channel mobility. 
 A server might create a temporary session channel and pass it to a client, dynamically altering the network topology. The spi-calculus treats channels as first-class citizens that can be encrypted and sent as messages. 
-Skja adopts this power, allowing us to reason about attacks where the structure of the network changes during the attack—such as an adversary injecting themselves into a session by stealing a session ID (channel) that didn't exist when the protocol started.
+Skja adopts this power, allowing us to reason about attacks where the structure of the network changes during the attack, such as an adversary injecting themselves into a session by stealing a session ID (channel) that didn't exist when the protocol started.
 
 \textbf{3. Replication and Asynchrony.}
 Finally, modeling infinite behavior via the replication operator ($!P$) is native to spi-calculus but cumbersome in standard AL. While our current implementation focuses on finite traces for exploit generation, building on the spi-calculus foundation prepares Skja for future extensions involving unbounded replication, such as modeling Distributed Denial of Service (DDoS) attacks where $N$ attackers flood a target.
@@ -161,8 +171,7 @@ Finally, modeling infinite behavior via the replication operator ($!P$) is nativ
 
 In this section we build all the semantics and rules which transform adversarial logic to Skja.
 First, we assume the reader is familiar with the semantics of adversarial logic and refer them to the original paper for the full set \cite{vanegue2022adversarial}, our work states what is new to the established semantics.  
-
-First we change the state space. In AL, states were rigid couples $(\sigma_p, \sigma_a)$. To support $n$-ary composition, we map Process IDs to their local stores.
+We start by changing the state space. In AL, states were rigid couples $(\sigma_p, \sigma_a)$. To support $n$-ary composition, we map Process IDs to their local stores.
 
 \begin{definition}[General State Space]
 $\Sigma ::= [PIDs \rightharpoonup Variables \to Values]$
@@ -477,7 +486,7 @@ In Skja, the reachability of $\Delta_{final}$ where the adversary knows $Nb$ con
 \section{Related Work}
 Related work in program analysis and formal verification of protocols and software comes with a rather rich history. We stand on the shoulders of giants, yet the integration of incorrectness logic with process calculi remains under-explored.
 
-\textbf{Program Logics.} The foundation of our work rests on Incorrectness Logic \cite{o2019incorrectness}, which inverted the reasoning of standard Hoare Logic \cite{hoare1969axiomatic}. While standard logic proves the absence of bugs, incorrectness logic proves their presence. This is particularly relevant for security, where demonstrating an exploit path is often more valuable than a theoretical safety guarantee.
+\textbf{Program Logics.} The foundation of our work rests on Incorrectness Logic \cite{o2019incorrectness}, which inverted the reasoning of standard Hoare Logic \cite{hoare1969axiomatic,floyd1993assigning}. While standard logic proves the absence of bugs, incorrectness logic proves their presence. This is particularly relevant for security, where demonstrating an exploit path is often more valuable than a theoretical safety guarantee.
 
 \textbf{Process Calculi and Security.} The use of process calculi \cite{milner1980calculus} to model security protocols was pioneered by Abadi and Gordon with the spi-calculus % \cite{abadi1999calculus}. 
 This introduced cryptographic primitives directly into the operational semantics of the $\pi$-calculus. While automated tools like ProVerif \cite{blanchet2018proverif}, WALDO \cite{linvill2023verifying} and Tamarin\cite{meier2013tamarin}
@@ -488,8 +497,11 @@ Abstract Interpretation \cite{cousot1996abstract} is the archetypal framework fo
 
 As noted by O'Hearn \cite{o2019incorrectness} and Vanegue \cite{vanegue2022adversarial}, incorrectness logic can be viewed as an abstract interpretation where the domain $\mathcal{D}$ represents subsets of reachable states. For Skja, our domain is enriched with the Dolev-Yao adversary model. We can define our abstract domain $\mathcal{D}^\sharp$ as the product of the program state lattice and the adversary knowledge lattice:
 $$ \mathcal{D}^\sharp = \mathcal{P}(\Sigma_{prog}) \times \mathcal{K}_{adv} $$
-where $\mathcal{K}_{adv}$ represents the set of derivable messages. The abstraction function $\alpha$ maps concrete execution traces to these logical assertions. Our fixpoint computation, therefore, does not find the "smallest set containing all behaviors" (Least Fixpoint in safety analysis), but rather attempts to find a "non-empty set of confirmed behaviors" (identifying satisfying traces for exploitation). This aligns Skja with \textit{under-approximate abstract interpretation}, a growing field that formalizes bug finding as a rigorous static analysis discipline rather than heuristics.
+where $\mathcal{K}_{adv}$ represents the set of derivable messages. The abstraction function $\alpha$ maps concrete execution traces to these logical assertions. 
+Our fixpoint computation, therefore, does not find the "smallest set containing all behaviors", but rather attempts to find a "non-empty set of confirmed behaviors".
+This aligns Skja with \textit{under-approximate abstract interpretation}.
 There is also rather interesting working showing the connection between abstract interpretation and program logics which state the connection between them \cite{cousot2024calculational}.
+
 \textbf{Adversarial Logic.} The most direct predecessor to Skja is Adversarial Logic \cite{vanegue2022adversarial}. While groundbreaking in applying under-approximation to security, it is limited by its "rigid couple" state space (Program vs. Adversary). Our work generalizes this to an $n$-ary composition, effectively unblocking the modeling of multi-party protocols and complex topologies that were previously awkward to represent in the original Adversarial Logic framework.
 \section{Conclusion and future work} 
 In this paper, we adapted under-approximation logic for security and boosted its versatility by integrating techniques from the spi-calculus.
@@ -502,7 +514,8 @@ An interesting line of future work is to turn Skja into an algorithm which not o
 This could be achieved through a bounded model checking based search algorithms.
 Both under-approximation and over-approximation could be combined like in \cite{zilberstein2023outcome} to get benefit of both worlds.
 We believe this to be an interesting research direction. 
-One could also Certify incorrectness logic and Skja with a dependent type theory based theorem prover like Lean \cite{de2015lean}, ROCQ \cite{chlipala2013certified} and Isabelle\cite{paulson1994isabelle}.
+One could also Certify incorrectness logic and Skja with a dependent type theory based theorem prover like Lean \cite{de2015lean}, ROCQ \cite{chlipala2013certified} and Isabelle\cite{paulson1994isabelle}. 
+The Dolev-Yao attacker formalisim could follow the work \cite{paulson1997proving} which follows Isabelle to construct a induction based protcol.
 Finally, as reviewed in related work, application of abstract interpretation to underapproximation is exiciting direction.
 \begin{acks}
 I thank my advisor, Dr. Gowtham Kaki. 
